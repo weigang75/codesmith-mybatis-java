@@ -97,6 +97,22 @@ public class <%=GetClassName()%> implements Serializable {
         return sbStr.toString();
                         
 	}
+    
+    public static class Builder{
+		private  <%=GetClassName()%> _<%=GetCamelCaseName(SourceTable)%> = new <%=GetClassName()%>();
+		public <%=GetClassName()%> build(){
+			return _<%=GetCamelCaseName(SourceTable)%>;
+		}
+ <%
+	foreach(ColumnSchema col in SourceTable.Columns)
+	{
+	%>
+		public Builder <%=StringUtil.ToCamelCase(col.Name)%>(<%=GetJavaType(col)%> <%=StringUtil.ToCamelCase(col.Name)%>){
+			_<%=GetCamelCaseName(SourceTable)%>.set<%= StringUtil.ToPascalCase(col.Name) %>(<%=StringUtil.ToCamelCase(col.Name)%>);
+			return this;
+		}
+   <%}%>
+	}
 }
 
 <script runat="template">
