@@ -51,7 +51,7 @@ import <%=ModelPackage%>.<%=domainClassName%>;
  * <%=SourceTable.Description %>
  */
 @Mapper
-public interface <%=domainClassName%>Mapper {
+public interface <%=domainClassName%>MapperBase {
     /**
      * 新增
      * @param <%=domainVariableName%>
@@ -134,7 +134,7 @@ public interface <%=domainClassName%>Mapper {
 
 <script runat="template">
     public override string GetFileName() {
-        return GetDomainClassName() + "Mapper.java";
+        return GetDomainClassName() + "MapperBase.java";
     }
     
     public string GetDomainClassName() {

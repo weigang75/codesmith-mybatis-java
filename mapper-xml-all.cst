@@ -24,7 +24,7 @@ Description:
 <%@ Property Name="SourceTables" Optional="True" Type="SchemaExplorer.TableSchemaCollection" Category="Database" Description="可以选择多张表." %>
 
 <%@ Register Name="MapperXml" Template="mapper-xml.cst" MergeProperties="False" ExcludeProperties="" %>
-
+<%@ Register Name="MapperXmlEx" Template="mapper-xml-ex.cst" MergeProperties="False" ExcludeProperties="" %>
 <%		
 	output();
 %>
@@ -41,7 +41,7 @@ Description:
     public void output() {
         foreach(TableSchema table in SourceTables)
     	{
-            String fileName = MapperXmlPath + "\\" + GetPascalCaseName(table) + MapperXmlPostfix;
+            String fileName = MapperXmlPath + "\\" + GetPascalCaseName(table) + ".generated" + MapperXmlPostfix;
             this.Response.WriteLine(new System.IO.FileInfo(fileName).FullName + "...");
             MapperXml mapper = this.Create<MapperXml>();
             mapper.SourceTable = table;
@@ -49,6 +49,15 @@ Description:
             mapper.TablePrefix = TablePrefix;
             mapper.NameSpace = NameSpace;
             RenderToFile(mapper,fileName);
+            
+            String fileNameEx = MapperXmlPath + "\\" + GetPascalCaseName(table) + MapperXmlPostfix;
+            this.Response.WriteLine(new System.IO.FileInfo(fileNameEx).FullName + "...");
+            MapperXmlEx mapperEx = this.Create<MapperXmlEx>();
+            mapperEx.SourceTable = table;
+            mapperEx.Author = Author;
+            mapperEx.TablePrefix = TablePrefix;
+            mapperEx.NameSpace = NameSpace;
+            RenderToFile(mapperEx,fileNameEx);
         }
         this.Response.WriteLine("\r\nTotal " + SourceTables.Count + " generated successfull.");
     }

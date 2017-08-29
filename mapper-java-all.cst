@@ -24,6 +24,7 @@ Description:
 <%@ Property Name="SourceTables" Optional="True" Type="SchemaExplorer.TableSchemaCollection" Category="Database" Description="可以选择多张表." %>
 
 <%@ Register Name="MapperJava" Template="mapper-java.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Register Name="MapperJavaEx" Template="mapper-java-ex.cst" MergeProperties="False" ExcludeProperties="" %>
 
 <%		
 	output();
@@ -33,7 +34,7 @@ Description:
     public void output() {
         foreach(TableSchema table in SourceTables)
     	{
-            String fileName = MapperJavaPath + "\\" + GetPascalCaseName(table) + "Mapper.java";
+            String fileName = MapperJavaPath + "\\" + GetPascalCaseName(table) + "MapperBase.java";
             this.Response.WriteLine(new System.IO.FileInfo(fileName).FullName + "...");
             MapperJava mapper = this.Create<MapperJava>();
             mapper.SourceTable = table;
@@ -41,6 +42,16 @@ Description:
             mapper.TablePrefix = TablePrefix;
             mapper.NameSpace = NameSpace;
             RenderToFile(mapper,fileName);
+            
+            String fileNameEx = MapperJavaPath + "\\" + GetPascalCaseName(table) + "Mapper.java";
+            this.Response.WriteLine(new System.IO.FileInfo(fileNameEx).FullName + "...");
+            MapperJavaEx mapperEx = this.Create<MapperJavaEx>();
+            mapperEx.SourceTable = table;
+            mapperEx.Author = Author;
+            mapperEx.TablePrefix = TablePrefix;
+            mapperEx.NameSpace = NameSpace;
+            RenderToFile(mapperEx,fileNameEx);
+            
         }
         this.Response.WriteLine("\r\nTotal " + SourceTables.Count + " generated successfull.");
     }
