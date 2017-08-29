@@ -56,6 +56,7 @@ bool isIdentity = false;
 if(pkCol != null)
     isIdentity = Boolean.Parse(pkCol.ExtendedProperties["CS_IsIdentity"].Value.ToString());
 //Response.Write(isIdentity);
+int idx = 0;
 %>
 <mapper namespace="<%=MapperJavaPackage%>.<%=GetDomainClassName()%>Mapper">
 	<resultMap type="<%=typeFullName%>" id="<% =MapName %>"><% GenerateResultColumns(SourceTable.Columns); %></resultMap>
@@ -94,7 +95,66 @@ if(pkCol != null)
             </if>    
         <%} %>
         </trim>
-    </insert>    
+    </insert><% if(!isIdentity) {%>
+    <!-- 保存 -->
+    <update id="save" parameterType="<%=typeFullName%>">
+    INSERT INTO <%=SourceTable.Name%>(
+        <%
+        idx = 0;
+        foreach(ColumnSchema col in SourceTable.Columns) {
+            idx++;
+            if(IsIdentity(col))continue;
+            %><%=col.Name %> <%if(idx<SourceTable.Columns.Count){%>,<%}%><%} %>
+    ) VALUES (
+        <%  
+        idx = 0;
+        foreach(ColumnSchema col in SourceTable.Columns) { 
+            idx++;
+            if(IsIdentity(col))continue; 
+        %>#{<%=GetCamelCaseName(col)%>,jdbcType=<%=GetJdbcType(col)%>} <%if(idx<SourceTable.Columns.Count){%>,<%}%><%} %>
+    )
+    ON DUPLICATE KEY UPDATE 
+    <% 
+        idx = 0;
+        foreach(ColumnSchema col in SourceTable.Columns) { 
+            idx++;
+            if(col.IsPrimaryKeyMember)
+               continue;
+    %><%=col.Name %> = #{<%=GetCamelCaseName(col)%>,jdbcType=<%=GetJdbcType(col)%>} <%if(idx<SourceTable.Columns.Count){%>,<%}%><%} %>
+    </update>
+    <!-- 保存，忽略空值字段 -->
+    <update id="saveSelective" parameterType="<%=typeFullName%>">
+    INSERT INTO <%=SourceTable.Name%>
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+        <%  foreach(ColumnSchema col in SourceTable.Columns) {
+                if(IsIdentity(col))continue;
+            %>      
+            <if test="<%=GetCamelCaseName(col)%> != null" >
+            <%=col.Name %>,
+            </if>            
+        <%} %>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides="," >
+        <%  foreach(ColumnSchema col in SourceTable.Columns) { 
+                if(IsIdentity(col))continue; 
+        %>       
+            <if test="<%=GetCamelCaseName(col)%> != null" >
+            #{<%=GetCamelCaseName(col)%>,jdbcType=<%=GetJdbcType(col)%>},
+            </if>    
+        <%} %>
+        </trim>
+    ON DUPLICATE KEY UPDATE 
+        <trim prefix="" suffix="" suffixOverrides="," >
+         <% foreach(ColumnSchema col in SourceTable.Columns) { 
+               if(col.IsPrimaryKeyMember)
+                   continue;
+         %>    
+            <if test="<%=GetCamelCaseName(col)%> != null" >
+            <%=col.Name %> = #{<%=GetCamelCaseName(col)%>,jdbcType=<%=GetJdbcType(col)%>},
+            </if>
+        <%} %>       
+        </trim>
+    </update><%} %>
     <!-- 修改 -->
     <update id="update" parameterType="<%=typeFullName%>">
     <%=GetUpdateSQL(pkCol)%>
@@ -107,9 +167,9 @@ if(pkCol != null)
            if(col.IsPrimaryKeyMember)
                continue;
      %>
-            <if test="<%=GetCamelCaseName(col)%> != null" >
-            <%=col.Name %> = #{<%=GetCamelCaseName(col)%>,jdbcType=<%=GetJdbcType(col)%>},
-            </if>      
+        <if test="<%=GetCamelCaseName(col)%> != null" >
+        <%=col.Name %> = #{<%=GetCamelCaseName(col)%>,jdbcType=<%=GetJdbcType(col)%>},
+        </if>
       <%} %>
         </set>
     WHERE <%=pkCol.Name%> = #{<%=GetCamelCaseName(pkCol)%>}

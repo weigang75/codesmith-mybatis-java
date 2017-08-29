@@ -25,6 +25,10 @@ Description:
 <%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Category="Database" Description="只能选择一个表." %>
 <%
 ColumnSchema pkCol = GetPrimaryKey(SourceTable);
+bool isIdentity = false;
+if(pkCol != null)
+    isIdentity = Boolean.Parse(pkCol.ExtendedProperties["CS_IsIdentity"].Value.ToString());
+
 List<ColumnSchema> uniqueColumns = GetUniqueColumns(SourceTable);
 string domainClassName = GetDomainClassName();
 string domainVariableName = GetDomainVariableName();
@@ -57,7 +61,17 @@ public interface <%=domainClassName%>Mapper {
      * 新增，忽略空值字段
      * @param <%=domainVariableName%>
      */   
-    int insertSelective(<%=domainClassName%> <%=domainVariableName%>);    
+    int insertSelective(<%=domainClassName%> <%=domainVariableName%>); <% if(!isIdentity) {%>    
+    /**
+     * 保存（无则新增，有则修改）
+     * @param <%=domainVariableName%>
+     */	  
+    int save(<%=domainClassName%> <%=domainVariableName%>);
+    /**
+     * 保存（无则新增，有则修改），忽略空值字段
+     * @param <%=domainVariableName%>
+     */	  
+    int saveSelective(<%=domainClassName%> <%=domainVariableName%>);<%} %>
     /**
      * 修改
      * @param <%=domainVariableName%>
