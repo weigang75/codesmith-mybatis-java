@@ -175,6 +175,7 @@ public class CodeBehindClass : CodeTemplate
             string val = col.NativeType.ToString().ToUpper();
             switch(val){
                 case "INT" : return "INTEGER";
+				case "DATETIME" : return "DATE";
                 default:
                     return val;
             }
