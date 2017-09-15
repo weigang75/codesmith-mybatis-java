@@ -17,6 +17,8 @@ public class CodeBehindClass : CodeTemplate
     }
     
 	private String _nameSpace = "com.wmqe.pms";
+    private String _moduleName = "";
+    private String _fullNameSpace = "";
     private String _author = "";
     private String _tablePrefix = "tb_pr_,tb_g_,tb_se_,tb_sp_,tb_";
     private String _deleteFlag = "DELETEFLAG"; // 逻辑删除字段的名称
@@ -39,6 +41,13 @@ public class CodeBehindClass : CodeTemplate
         }        
     }
     
+    protected String UnDeleteFlagValue{
+        get
+        {
+            return "0";
+        }        
+    }
+    
     protected String VersionColName{
         get
         {
@@ -57,14 +66,14 @@ public class CodeBehindClass : CodeTemplate
     protected String MapperJavaPath{
         get
         {
-            return OutputDirectory + "\\main\\" + _nameSpace.Replace(".","\\") + "\\" + mapperJavaPath.Replace(".","\\");
+            return OutputDirectory + "\\main\\" + _fullNameSpace.Replace(".","\\") + "\\" + mapperJavaPath.Replace(".","\\");
         }        
     }
     
     protected String MapperJavaPackage{
         get
         {
-            return _nameSpace.TrimEnd('.') + "." + mapperJavaPath;
+            return _fullNameSpace.TrimEnd('.') + "." + mapperJavaPath;
         }        
     }
     
@@ -72,42 +81,42 @@ public class CodeBehindClass : CodeTemplate
     protected String MapperXmlPath{
         get
         {
-            return OutputDirectory + "\\main\\" + _nameSpace.Replace(".","\\") + "\\" + mapperXmlPath.Replace(".","\\");
+            return OutputDirectory + "\\main\\" + _fullNameSpace.Replace(".","\\") + "\\" + mapperXmlPath.Replace(".","\\");
         }        
     }
     
     protected String MapperXmlPackage{
         get
         {
-            return _nameSpace.TrimEnd('.') + "." + mapperXmlPath;
+            return _fullNameSpace.TrimEnd('.') + "." + mapperXmlPath;
         }        
     }
     
     protected String ModelPath{
         get
         {
-            return OutputDirectory + "\\main\\" + _nameSpace.Replace(".","\\") + "\\" + modelPath.Replace(".","\\");
+            return OutputDirectory + "\\main\\" + _fullNameSpace.Replace(".","\\") + "\\" + modelPath.Replace(".","\\");
         }        
     }
     
     protected String ModelPackage{
         get
         {
-            return _nameSpace.TrimEnd('.') + "." + modelPath;
+            return _fullNameSpace.TrimEnd('.') + "." + modelPath;
         }        
     }
     
      protected String ServicePath{
         get
         {
-            return OutputDirectory + "\\main\\" + _nameSpace.Replace(".","\\") + "\\" + servicePath.Replace(".","\\");
+            return OutputDirectory + "\\main\\" + _fullNameSpace.Replace(".","\\") + "\\" + servicePath.Replace(".","\\");
         }        
     }
     
     protected String ServicePackage{
         get
         {
-            return _nameSpace.TrimEnd('.') + "." + servicePath;
+            return _fullNameSpace.TrimEnd('.') + "." + servicePath;
         }        
     }
     
@@ -115,14 +124,14 @@ public class CodeBehindClass : CodeTemplate
     protected String ServiceTestPath{
         get
         {
-            return OutputDirectory + "\\test\\" + _nameSpace.Replace(".","\\") + "\\" + serviceTestPath.Replace(".","\\");
+            return OutputDirectory + "\\test\\" + _fullNameSpace.Replace(".","\\") + "\\" + serviceTestPath.Replace(".","\\");
         }        
     }
     
     protected String ServiceTestPackage{
         get
         {
-            return _nameSpace.TrimEnd('.') + "." + serviceTestPath;
+            return _fullNameSpace.TrimEnd('.') + "." + serviceTestPath;
         }        
     }
     
@@ -132,6 +141,22 @@ public class CodeBehindClass : CodeTemplate
 	{
 		get {return _nameSpace;}
 		set {_nameSpace = value;}
+	}
+    
+    [Category("01.项目信息")]
+	[Description("模块名")]
+	public virtual String ModuleName
+	{
+		get {return _moduleName;}
+		set {_moduleName = value;}
+	}
+    
+    //[Category("01.项目信息")]
+	//[Description("全包名")]
+	public virtual String FullNameSpace
+	{
+		get {return _fullNameSpace;}
+		set {_fullNameSpace = value;}
 	}
 	
 	[Category("01.项目信息")]
@@ -175,7 +200,8 @@ public class CodeBehindClass : CodeTemplate
             string val = col.NativeType.ToString().ToUpper();
             switch(val){
                 case "INT" : return "INTEGER";
-				case "DATETIME" : return "DATE";
+				case "DATE" : return "DATE";
+				case "DATETIME" : return "TIMESTAMP";  //return "DATE";
                 default:
                     return val;
             }
